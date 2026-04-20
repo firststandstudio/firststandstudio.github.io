@@ -1,0 +1,55 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+interface Props {
+  className?: string;
+  density?: number;
+  tone?: "studio" | "erire" | "footer";
+  shape?: "dot" | "leaf";
+  distribution?: "cluster" | "wide";
+  clusterX?: number;
+  clusterY?: number;
+}
+
+const {
+  className = "",
+  density = 18,
+  tone = "studio",
+  shape = "dot",
+  distribution = "cluster",
+  clusterX = 0.68,
+  clusterY = 0.42
+} = Astro.props;
+---
+
+<div class={`particleField ${className}`.trim()} aria-hidden="true">
+  <canvas
+    data-particle-zone
+    data-density={density}
+    data-tone={tone}
+    data-shape={shape}
+    data-distribution={distribution}
+    data-cluster-x={clusterX}
+    data-cluster-y={clusterY}
+  ></canvas>
+</div>
+
+<style>
+  .particleField {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    opacity: 0.92;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    canvas {
+      opacity: 0.45;
+    }
+  }
+</style>

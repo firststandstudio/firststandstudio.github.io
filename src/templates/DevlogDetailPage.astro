@@ -1,0 +1,158 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import type { CollectionEntry } from "astro:content";
+import { projectMap } from "../data/projects";
+import { getDictionary } from "../i18n/copy";
+import { getLocalizedDevlogFromEntry } from "../i18n/devlogs";
+import { defaultLocale, localizePath, type SupportedLocale } from "../i18n/config";
+import { getLocalizedProject } from "../i18n/projects";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { formatDate } from "../lib/date";
+
+interface Props {
+  entry: CollectionEntry<"devlogs">;
+  locale?: SupportedLocale;
+}
+
+const { entry, locale = defaultLocale } = Astro.props;
+const dict = getDictionary(locale);
+const copy = getLocalizedDevlogFromEntry(entry, locale);
+const relatedProject = entry.data.project ? projectMap.get(entry.data.project) : undefined;
+const localizedProject = relatedProject ? getLocalizedProject(relatedProject, locale) : undefined;
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: copy.title,
+  description: copy.description,
+  datePublished: entry.data.pubDate.toISOString(),
+  dateModified: (entry.data.updatedDate ?? entry.data.pubDate).toISOString(),
+  author: {
+    "@type": "Person",
+    name: "Yahia Saad"
+  }
+};
+---
+
+<BaseLayout
+  title={copy.title}
+  description={copy.description}
+  type="article"
+  structuredData={articleSchema}
+  locale={locale}
+>
+  <section class="section pageIntro">
+    <div class="shell">
+      <article class="article">
+        <a class="backLink" href={localizePath("/devlog/", locale)} data-reveal>{dict.common.backToDevlog}</a>
+
+        <header class="articleHeader">
+          <p class="eyebrow" data-reveal>{dict.devlog.articleEyebrow}</p>
+          <h1 transition:name="page-title" data-reveal style="--reveal-delay: 80ms;">
+            {copy.title}
+          </h1>
+          <p class="lede" data-reveal style="--reveal-delay: 160ms;">{copy.description}</p>
+
+          <div class="articleMeta" data-reveal style="--reveal-delay: 240ms;">
+            <time datetime={entry.data.pubDate.toISOString()}>{formatDate(entry.data.pubDate, locale)}</time>
+            {copy.tags.length > 0 && <span>{copy.tags.join(" · ")}</span>}
+            {
+              localizedProject && (
+                <a href={localizePath(`/projects/${localizedProject.slug}/`, locale)}>{localizedProject.title}</a>
+              )
+            }
+          </div>
+        </header>
+
+        <div class="prose" data-reveal style="--reveal-delay: 320ms;">
+          {copy.body.map((block) => {
+            if (block.type === "paragraph") {
+              return <p>{block.text}</p>;
+            }
+
+            if (block.type === "highlight") {
+              return <p class="highlight">{block.text}</p>;
+            }
+
+            return (
+              <ul>
+                {block.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            );
+          })}
+        </div>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .article {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .backLink {
+    display: inline-flex;
+    width: fit-content;
+    color: var(--green-bright);
+    font-size: 0.82rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .articleHeader {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .articleHeader h1 {
+    font-size: clamp(3rem, 6vw, 5.2rem);
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  .articleMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .articleMeta a {
+    color: var(--green-bright);
+  }
+
+  .prose {
+    display: grid;
+    gap: 0;
+    max-width: 46rem;
+    color: var(--text-soft);
+    font-size: 1.04rem;
+  }
+
+  .prose p,
+  .prose ul {
+    margin: 0 0 1.2rem;
+  }
+
+  .prose ul {
+    padding-inline-start: 1.2rem;
+  }
+
+  .prose li + li {
+    margin-top: 0.55rem;
+  }
+
+  .highlight {
+    color: var(--text);
+    font-family: var(--font-serif);
+    font-size: clamp(1.55rem, 3vw, 2rem);
+    line-height: 1.08;
+  }
+</style>

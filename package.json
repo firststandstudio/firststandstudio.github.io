@@ -1,0 +1,22 @@
+{
+  "name": "first-stand-studio-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@11.12.1",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro sync && tsc --noEmit"
+  },
+  "devDependencies": {
+    "@astrojs/sitemap": "^3.7.2",
+    "astro": "^5.13.5",
+    "typescript": "^5.9.2"
+  }
+}

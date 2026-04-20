@@ -1,0 +1,156 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import type { TeamMember } from "../../data/types";
+
+interface Props {
+  members: TeamMember[];
+  futureTop: string;
+  futureBottom: string;
+}
+
+const { members, futureTop, futureBottom } = Astro.props;
+---
+
+<div class="ladder" data-reveal>
+  <div class="spine" aria-hidden="true"></div>
+  <div class="futureTop" aria-hidden="true">{futureTop}</div>
+
+  <div class="members">
+    {members.map((member, index) => (
+      <article class="node surfaceCard" style={`--delay:${index * 120}ms`}>
+        <div class="connector" aria-hidden="true"></div>
+        <div class="avatar" aria-hidden="true">
+          {member.image ? (
+            <img
+              src={member.image.src}
+              alt=""
+              width={member.image.width}
+              height={member.image.height}
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <span>{member.initials}</span>
+          )}
+        </div>
+
+        <div class="copy">
+          <p class="role">{member.role}</p>
+          <h3>{member.name}</h3>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <div class="futureBottom" aria-hidden="true">{futureBottom}</div>
+</div>
+
+<style>
+  .ladder {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1.4rem;
+    padding: 2rem 0 0.5rem;
+  }
+
+  .spine {
+    position: absolute;
+    top: 0.6rem;
+    bottom: 1rem;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(187, 145, 83, 0.62) 12%,
+      rgba(114, 88, 56, 0.1) 88%,
+      transparent
+    );
+  }
+
+  .futureTop,
+  .futureBottom {
+    position: relative;
+    z-index: 1;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .members {
+    display: grid;
+    gap: 1.4rem;
+    width: min(100%, 24rem);
+  }
+
+  .node {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    transition:
+      transform 220ms ease,
+      border-color 220ms ease;
+  }
+
+  .node:hover,
+  .node:focus-within {
+    transform: translateY(-3px);
+    border-color: var(--line-strong);
+  }
+
+  .connector {
+    position: absolute;
+    top: -1.4rem;
+    width: 1px;
+    height: 1.4rem;
+    background: linear-gradient(180deg, rgba(187, 145, 83, 0.62), transparent);
+  }
+
+  .avatar {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 7.6rem;
+    aspect-ratio: 1;
+    border: 1px solid var(--line);
+    border-radius: 1.8rem;
+    background:
+      radial-gradient(circle at 30% 24%, rgba(187, 145, 83, 0.16), transparent 42%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38));
+    overflow: clip;
+  }
+
+  .avatar span {
+    color: var(--text);
+    font-family: var(--font-serif);
+    font-size: 2.3rem;
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .copy {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .role {
+    color: var(--green-bright);
+    font-size: 0.76rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    font-size: clamp(1.8rem, 3vw, 2.2rem);
+  }
+</style>

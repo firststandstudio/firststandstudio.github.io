@@ -1,0 +1,74 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import DevlogCard from "../components/devlogs/DevlogCard.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import { getDictionary } from "../i18n/copy";
+import { getLocalizedDevlogFromEntry } from "../i18n/devlogs";
+import { defaultLocale, type SupportedLocale } from "../i18n/config";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getSortedDevlogs } from "../lib/content";
+
+interface Props {
+  locale?: SupportedLocale;
+}
+
+const { locale = defaultLocale } = Astro.props;
+const dict = getDictionary(locale);
+const devlogs = await getSortedDevlogs("erire");
+---
+
+<BaseLayout
+  title={dict.navigation.devlog}
+  description={dict.meta.devlogDescription}
+  type="website"
+  locale={locale}
+>
+  <section class="section pageIntro">
+    <div class="shellWide">
+      <SectionHeading
+        eyebrow={dict.devlog.indexEyebrow}
+        title={dict.devlog.indexTitle}
+        copy={dict.devlog.indexCopy}
+      />
+
+      <div class="grid">
+        {devlogs.map((entry, index) => {
+          const localizedEntry = getLocalizedDevlogFromEntry(entry, locale);
+
+          return (
+            <div style={`--reveal-delay:${index * 80}ms`}>
+              <DevlogCard
+                entry={entry}
+                locale={locale}
+                title={localizedEntry.title}
+                description={localizedEntry.description}
+                tags={localizedEntry.tags}
+                ctaLabel={dict.common.readEntry}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  @media (max-width: 1024px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

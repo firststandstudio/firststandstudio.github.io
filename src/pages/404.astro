@@ -1,0 +1,9 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import { getLocaleFromPath } from "../i18n/config";
+import NotFoundPage from "../templates/NotFoundPage.astro";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+---
+
+<NotFoundPage locale={locale} />

@@ -1,0 +1,224 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import ParticleField from "../motion/ParticleField.astro";
+
+interface Props {
+  content: {
+    eyebrow: string;
+    support: string;
+    pill: string;
+    founded: string;
+    positionLabel: string;
+    positionCopy: string;
+    standardLabel: string;
+    standardCopy: string;
+    standardDescriptor: string;
+    indicator: string;
+  };
+}
+
+const { content } = Astro.props;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="heroGlow" aria-hidden="true"></div>
+  <div class="heroSweep" aria-hidden="true"></div>
+  <ParticleField className="heroLeaves" density={20} tone="studio" shape="leaf" distribution="wide" />
+
+  <div class="shellWide heroShell">
+    <div class="copyBlock">
+      <p class="eyebrow heroEyebrow">{content.eyebrow}</p>
+      <h1 id="hero-title" transition:name="page-title">
+        <span class="mask"><span class="line">First Stand</span></span>
+        <span class="mask"><span class="line">Studio</span></span>
+      </h1>
+      <p class="support">{content.support}</p>
+      <div class="meta">
+        <span class="pill">{content.pill}</span>
+        <p>{content.founded}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    min-height: min(39rem, 78vh);
+    display: grid;
+    align-items: center;
+    padding: clamp(5.4rem, 8.6vw, 6.8rem) 0 clamp(3.6rem, 7vw, 5rem);
+    overflow: clip;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 24%),
+      linear-gradient(135deg, rgba(203, 172, 119, 0.12), transparent 42%);
+    opacity: 0.68;
+  }
+
+  .heroGlow,
+  .heroSweep {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .heroGlow {
+    background:
+      radial-gradient(circle at 22% 32%, rgba(187, 145, 83, 0.12), transparent 16rem),
+      radial-gradient(circle at 72% 18%, rgba(186, 157, 108, 0.08), transparent 22rem);
+    filter: blur(20px);
+    opacity: 0.62;
+  }
+
+  .heroSweep {
+    background: linear-gradient(
+      115deg,
+      transparent 24%,
+      rgba(255, 255, 255, 0.16) 42%,
+      transparent 58%
+    );
+    opacity: 0.24;
+  }
+
+  .heroShell {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 0;
+    align-items: center;
+    z-index: 2;
+  }
+
+  :global(.heroLeaves) {
+    z-index: 1;
+    opacity: 1;
+    mix-blend-mode: normal;
+  }
+
+  :global(.heroLeaves canvas) {
+    opacity: 1;
+    filter: saturate(1.18) contrast(1.04);
+  }
+
+  .copyBlock {
+    display: grid;
+    gap: 0.88rem;
+    justify-items: center;
+    align-self: center;
+    max-width: 38rem;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .heroEyebrow {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 700ms ease, transform 700ms ease;
+    transition-delay: 120ms;
+    justify-self: center;
+  }
+
+  .heroEyebrow::after {
+    content: "";
+    width: 3rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green-bright));
+  }
+
+  h1 {
+    display: grid;
+    justify-items: center;
+    gap: 0.36rem;
+    min-width: 0;
+    font-size: clamp(3.15rem, 7.4vw, 5.9rem);
+    line-height: 0.88;
+    text-align: center;
+    direction: ltr;
+    unicode-bidi: isolate;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  .mask {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .line {
+    display: inline-block;
+    padding-left: 0.16em;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(128%);
+    transition:
+      opacity 1080ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1080ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mask:nth-child(2) .line {
+    transition-delay: 120ms;
+  }
+
+  .support {
+    max-width: 21rem;
+    color: var(--text-soft);
+    font-size: clamp(0.82rem, 1.08vw, 0.94rem);
+    letter-spacing: 0.16em;
+    line-height: 1.7;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 760ms ease, transform 760ms ease;
+    transition-delay: 260ms;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    text-wrap: balance;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--text-muted);
+    min-width: 0;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 760ms ease, transform 760ms ease;
+    transition-delay: 420ms;
+    overflow-wrap: anywhere;
+  }
+
+  :global(html.is-ready) .heroEyebrow,
+  :global(html.is-ready) .support,
+  :global(html.is-ready) .meta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  :global(html.is-ready) .line {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      min-height: auto;
+      padding-top: 6.6rem;
+      padding-bottom: 4rem;
+    }
+  }
+</style>

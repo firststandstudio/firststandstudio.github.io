@@ -1,0 +1,326 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import type { ProjectRecord } from "../../data/types";
+import { defaultLocale, localizePath, type SupportedLocale } from "../../i18n/config";
+
+interface Props {
+  project: ProjectRecord;
+  locale?: SupportedLocale;
+}
+
+const { project, locale = defaultLocale } = Astro.props;
+---
+
+<a
+  class="projectCard"
+  href={localizePath(`/projects/${project.slug}/`, locale)}
+  style={`--project-accent: ${project.accent}; --project-accent-soft: ${project.accentSoft};`}
+  data-reveal
+>
+  <span class="outlineGlow" aria-hidden="true"></span>
+  <div class="text">
+    <h3>{project.title}</h3>
+    <p class="description">{project.description}</p>
+    <p class="status">{project.status}</p>
+  </div>
+
+  <div class="media" aria-hidden="true">
+    <div class="mediaInner">
+      <img
+        src={project.logo.src}
+        alt=""
+        width={project.logo.width}
+        height={project.logo.height}
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+  </div>
+</a>
+
+<style>
+  .projectCard {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+    padding: clamp(1.7rem, 3.8vw, 2.8rem);
+    border: 1px solid var(--line);
+    border-radius: clamp(1.9rem, 4vw, 2.4rem);
+    overflow: clip;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.56)),
+      var(--bg-panel-strong);
+    box-shadow: var(--shadow);
+    isolation: isolate;
+    transition:
+      transform 240ms ease,
+      border-color 220ms ease,
+      box-shadow 220ms ease,
+      background 220ms ease;
+    min-width: 0;
+    transform-origin: center center;
+  }
+
+  .projectCard::before,
+  .projectCard::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .projectCard::before {
+    inset: 0;
+    background:
+      radial-gradient(circle at 84% 18%, var(--project-accent-soft), transparent 26%),
+      linear-gradient(140deg, rgba(255, 255, 255, 0.56), transparent 36%);
+    opacity: 0.95;
+    z-index: -1;
+  }
+
+  .projectCard::after {
+    inset: auto 2rem 0 2rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(170, 120, 64, 0.45), transparent);
+    opacity: 0.7;
+  }
+
+  .outlineGlow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 220ms ease,
+      filter 220ms ease;
+    z-index: 2;
+  }
+
+  .outlineGlow::before,
+  .outlineGlow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .outlineGlow::before {
+    padding: 1px;
+    background: conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0) 0deg,
+      rgba(255, 255, 255, 0.58) 60deg,
+      rgba(187, 145, 83, 0.98) 118deg,
+      rgba(255, 244, 228, 0.26) 184deg,
+      rgba(170, 120, 64, 0.98) 242deg,
+      rgba(255, 255, 255, 0.46) 306deg,
+      rgba(255, 255, 255, 0) 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: projectOutlineSpin 2.8s linear infinite paused;
+  }
+
+  .outlineGlow::after {
+    inset: 1px;
+    border-radius: inherit;
+    box-shadow:
+      0 0 18px rgba(187, 145, 83, 0.22),
+      0 0 34px rgba(255, 244, 228, 0.2),
+      inset 0 0 18px rgba(255, 255, 255, 0.2);
+    opacity: 0;
+    animation: projectOutlinePulse 1.6s ease-in-out infinite alternate paused;
+  }
+
+  .text {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+    min-width: 0;
+    max-width: 34rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  h3 {
+    min-width: 0;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    text-wrap: balance;
+  }
+
+  .description {
+    min-width: 0;
+    max-width: 31rem;
+    color: var(--text-soft);
+    font-size: clamp(0.96rem, 1.35vw, 1.05rem);
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    min-width: 0;
+    padding: 0.46rem 0.82rem;
+    border: 1px solid rgba(170, 120, 64, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 248, 239, 0.8);
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .mediaInner {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(100%, 20rem);
+    aspect-ratio: 1 / 0.84;
+    padding: 1.4rem;
+    border: 1px solid rgba(114, 88, 56, 0.12);
+    border-radius: 1.7rem;
+    background:
+      radial-gradient(circle at center, rgba(255, 255, 255, 0.58), transparent 58%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.48));
+    overflow: clip;
+    isolation: isolate;
+    transition:
+      border-color 220ms ease,
+      box-shadow 220ms ease;
+  }
+
+  .media {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mediaInner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, var(--project-accent-soft), transparent 62%);
+    filter: blur(16px);
+  }
+
+  .mediaInner::after {
+    content: "";
+    position: absolute;
+    inset: 1rem;
+    border: 1px solid rgba(114, 88, 56, 0.08);
+    border-radius: 1.2rem;
+    z-index: 0;
+  }
+
+  .mediaInner img {
+    position: relative;
+    z-index: 1;
+    width: min(13rem, 72%);
+    max-width: 72%;
+    max-height: 74%;
+    object-fit: contain;
+    filter: saturate(1.02) drop-shadow(0 14px 26px rgba(74, 56, 31, 0.12));
+    transition: transform 220ms ease, filter 220ms ease;
+  }
+
+  .projectCard:hover,
+  .projectCard:focus-visible {
+    transform: rotate(-0.4deg);
+    border-color: rgba(170, 120, 64, 0.28);
+    box-shadow:
+      0 24px 50px rgba(86, 67, 42, 0.12),
+      0 0 32px rgba(187, 145, 83, 0.14);
+  }
+
+  .projectCard:hover .outlineGlow,
+  .projectCard:focus-visible .outlineGlow {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 14px rgba(187, 145, 83, 0.3))
+      drop-shadow(0 0 24px rgba(255, 243, 224, 0.18));
+  }
+
+  .projectCard:hover .outlineGlow::before,
+  .projectCard:hover .outlineGlow::after,
+  .projectCard:focus-visible .outlineGlow::before,
+  .projectCard:focus-visible .outlineGlow::after {
+    animation-play-state: running;
+  }
+
+  .projectCard:hover .outlineGlow::after,
+  .projectCard:focus-visible .outlineGlow::after {
+    opacity: 1;
+  }
+
+  .projectCard:hover .mediaInner,
+  .projectCard:focus-visible .mediaInner {
+    border-color: var(--line-strong);
+    box-shadow:
+      0 20px 36px rgba(86, 67, 42, 0.1),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+  }
+
+  .projectCard:hover .mediaInner img,
+  .projectCard:focus-visible .mediaInner img {
+    filter: saturate(1.04) drop-shadow(0 18px 30px rgba(74, 56, 31, 0.16));
+  }
+
+  @keyframes projectOutlineSpin {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes projectOutlinePulse {
+    0% {
+      opacity: 0.28;
+      box-shadow:
+        0 0 14px rgba(187, 145, 83, 0.18),
+        0 0 24px rgba(255, 244, 228, 0.14),
+        inset 0 0 10px rgba(255, 255, 255, 0.14);
+    }
+
+    50% {
+      opacity: 0.92;
+      box-shadow:
+        0 0 22px rgba(187, 145, 83, 0.34),
+        0 0 40px rgba(255, 244, 228, 0.22),
+        inset 0 0 16px rgba(255, 255, 255, 0.22);
+    }
+
+    100% {
+      opacity: 0.54;
+      box-shadow:
+        0 0 18px rgba(170, 120, 64, 0.28),
+        0 0 30px rgba(255, 244, 228, 0.18),
+        inset 0 0 12px rgba(255, 255, 255, 0.16);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .projectCard {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

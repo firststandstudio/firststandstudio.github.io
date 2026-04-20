@@ -1,0 +1,323 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import { capabilityTags, contactLinks, profileLinks } from "../../data/site";
+
+interface Props {
+  content: {
+    eyebrow: string;
+    title: string;
+    copy: string;
+    emailLabel: string;
+    githubLabel: string;
+    portfolioLabel: string;
+    button: string;
+  };
+}
+
+const { content } = Astro.props;
+
+const methods = [
+  {
+    label: content.emailLabel,
+    href: contactLinks.email.href,
+    value: contactLinks.email.value
+  },
+  {
+    label: content.githubLabel,
+    href: contactLinks.github.href,
+    value: contactLinks.github.value
+  },
+  {
+    label: content.portfolioLabel,
+    href: contactLinks.portfolio.href,
+    value: contactLinks.portfolio.value
+  }
+];
+
+const hireHref = contactLinks.email.href.startsWith("mailto:")
+  ? `${contactLinks.email.href}?subject=Hire%20a%20Dev`
+  : contactLinks.email.href;
+---
+
+<section class="workWithMe surfaceCard" data-reveal id="contact">
+  <div class="intro">
+    <p class="eyebrow">{content.eyebrow}</p>
+    <h2>{content.title}</h2>
+    <p class="copy">{content.copy}</p>
+  </div>
+
+  <div class="capabilities" aria-label="Capabilities">
+    {capabilityTags.map((tag) => (
+      <span>{tag}</span>
+    ))}
+  </div>
+
+  <div class="methods">
+    {methods.map((method) => (
+      <a
+        class="method"
+        href={method.href}
+        target={method.href.startsWith("http") ? "_blank" : undefined}
+        rel={method.href.startsWith("http") ? "noreferrer" : undefined}
+      >
+        <span class="label">{method.label}</span>
+        <span class="value">{method.value}</span>
+      </a>
+    ))}
+  </div>
+
+  <div class="examples">
+    {profileLinks.map((link) => (
+      <a href={link.href} target="_blank" rel="noreferrer">{link.label}</a>
+    ))}
+  </div>
+
+  <a class="cta" href={hireHref}>{content.button}</a>
+</section>
+
+<style>
+  .workWithMe {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2rem);
+    justify-items: center;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    border-radius: clamp(1.8rem, 4vw, 2.2rem);
+    text-align: center;
+  }
+
+  .intro {
+    display: grid;
+    gap: 0.85rem;
+    max-width: 36rem;
+    min-width: 0;
+  }
+
+  h2,
+  .copy {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+    text-wrap: balance;
+  }
+
+  .copy {
+    color: var(--text-soft);
+  }
+
+  .capabilities {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.65rem;
+    width: 100%;
+  }
+
+  .capabilities span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 248, 239, 0.72);
+    color: var(--text-soft);
+    font-size: 0.76rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.9rem;
+    width: 100%;
+  }
+
+  .method {
+    position: relative;
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    min-width: 0;
+    min-height: 6.5rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: rgba(255, 249, 241, 0.76);
+    overflow: clip;
+    isolation: isolate;
+    text-align: start;
+    transition:
+      transform 220ms ease,
+      border-color 220ms ease,
+      background 220ms ease,
+      box-shadow 220ms ease;
+    transform-origin: center center;
+  }
+
+  .method::before,
+  .method::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity 220ms ease,
+      filter 220ms ease;
+  }
+
+  .method::before {
+    padding: 1px;
+    background: conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0) 0deg,
+      rgba(255, 255, 255, 0.38) 78deg,
+      rgba(187, 145, 83, 0.88) 146deg,
+      rgba(255, 250, 242, 0.18) 214deg,
+      rgba(170, 120, 64, 0.86) 292deg,
+      rgba(255, 255, 255, 0) 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: contactOutlineSpin 3.4s linear infinite paused;
+  }
+
+  .method::after {
+    inset: 1px;
+    box-shadow:
+      0 0 10px rgba(187, 145, 83, 0.16),
+      0 0 20px rgba(255, 244, 228, 0.14),
+      inset 0 0 10px rgba(255, 255, 255, 0.12);
+    animation: contactOutlinePulse 1.9s ease-in-out infinite alternate paused;
+  }
+
+  .method:hover,
+  .method:focus-visible {
+    transform: rotate(-0.24deg);
+    border-color: rgba(170, 120, 64, 0.24);
+    background: rgba(255, 250, 244, 0.96);
+    box-shadow:
+      var(--shadow-soft),
+      0 0 18px rgba(187, 145, 83, 0.08);
+  }
+
+  .method:hover::before,
+  .method:hover::after,
+  .method:focus-visible::before,
+  .method:focus-visible::after {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(187, 145, 83, 0.2));
+    animation-play-state: running;
+  }
+
+  .label {
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .value {
+    min-width: 0;
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .examples {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .examples a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.7rem;
+    padding: 0 0.95rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 248, 239, 0.68);
+    color: var(--text-soft);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition:
+      border-color 220ms ease,
+      background 220ms ease,
+      color 220ms ease;
+  }
+
+  .examples a:hover,
+  .examples a:focus-visible {
+    border-color: var(--line-strong);
+    background: rgba(255, 250, 244, 0.96);
+    color: var(--text);
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0 1.2rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 248, 239, 0.84);
+    color: var(--text);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition:
+      transform 220ms ease,
+      border-color 220ms ease,
+      background 220ms ease;
+  }
+
+  .cta:hover,
+  .cta:focus-visible {
+    border-color: var(--line-strong);
+    background: rgba(255, 250, 244, 1);
+  }
+
+  @keyframes contactOutlineSpin {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes contactOutlinePulse {
+    0% {
+      box-shadow:
+        0 0 9px rgba(187, 145, 83, 0.14),
+        0 0 18px rgba(255, 244, 228, 0.12),
+        inset 0 0 9px rgba(255, 255, 255, 0.1);
+    }
+
+    100% {
+      box-shadow:
+        0 0 15px rgba(187, 145, 83, 0.24),
+        0 0 26px rgba(255, 244, 228, 0.18),
+        inset 0 0 14px rgba(255, 255, 255, 0.16);
+    }
+  }
+</style>

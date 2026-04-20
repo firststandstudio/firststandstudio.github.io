@@ -1,0 +1,69 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import AboutManifesto from "../components/about/AboutManifesto.astro";
+import WorkWithMeSection from "../components/contact/WorkWithMeSection.astro";
+import HeroSection from "../components/hero/HeroSection.astro";
+import ProjectShowcaseCard from "../components/projects/ProjectShowcaseCard.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import { siteConfig } from "../data/site";
+import { getDictionary } from "../i18n/copy";
+import { defaultLocale, type SupportedLocale } from "../i18n/config";
+import { getLocalizedProjects } from "../i18n/projects";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+interface Props {
+  locale?: SupportedLocale;
+}
+
+const { locale = defaultLocale } = Astro.props;
+const dict = getDictionary(locale);
+const [featuredProject] = getLocalizedProjects(locale);
+
+if (!featuredProject) {
+  throw new Error("At least one project must be configured.");
+}
+---
+
+<BaseLayout locale={locale} description={dict.meta.defaultDescription}>
+  <HeroSection content={dict.hero} />
+
+  <section class="section projects" id="projects">
+    <div class="shellWide">
+      <SectionHeading
+        eyebrow={dict.home.projectsEyebrow}
+        title={dict.home.projectsTitle}
+        copy={dict.home.projectsCopy}
+      />
+      <ProjectShowcaseCard project={featuredProject} locale={locale} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <AboutManifesto
+        eyebrow={dict.aboutSection.eyebrow}
+        manifesto={dict.aboutSection.manifesto}
+        aboutText={dict.aboutSection.aboutText}
+        founderLabel={dict.aboutSection.founderLabel}
+        founderValue={siteConfig.location}
+        originLabel={dict.aboutSection.originLabel}
+        originValue={siteConfig.skillSummary}
+        positionLabel={dict.aboutSection.positionLabel}
+        positionValue={dict.aboutSection.positionValue}
+      />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <WorkWithMeSection content={dict.contactSection} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .projects {
+    margin-top: 0;
+    padding-top: clamp(0.75rem, 3vw, 1.75rem);
+  }
+</style>

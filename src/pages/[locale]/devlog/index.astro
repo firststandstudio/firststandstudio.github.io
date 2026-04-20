@@ -1,0 +1,15 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import { getSecondaryLocales, type SupportedLocale } from "../../../i18n/config";
+import DevlogIndexPage from "../../../templates/DevlogIndexPage.astro";
+
+export function getStaticPaths() {
+  return getSecondaryLocales().map((locale) => ({
+    params: { locale }
+  }));
+}
+
+const { locale } = Astro.params as { locale: SupportedLocale };
+---
+
+<DevlogIndexPage locale={locale} />

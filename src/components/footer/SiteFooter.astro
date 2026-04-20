@@ -1,0 +1,101 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import { socialLinks } from "../../data/site";
+import { getDictionary } from "../../i18n/copy";
+import { defaultLocale, type SupportedLocale } from "../../i18n/config";
+
+interface Props {
+  locale?: SupportedLocale;
+}
+
+const { locale = defaultLocale } = Astro.props;
+const dict = getDictionary(locale);
+---
+
+<footer class="siteFooter">
+  <div class="shellWide content">
+    <div class="identity" data-reveal>
+      <p class="eyebrow">{dict.common.studioFooter}</p>
+      <p class="copyright">{dict.footer.copyright}</p>
+      <p class="tagline">{dict.footer.tagline}</p>
+    </div>
+
+    <nav aria-label={dict.common.footerLinksAria} class="links" data-reveal style="--reveal-delay: 120ms;">
+      {socialLinks.map((link) => (
+        <a href={link.href} target={link.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer">
+          {link.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .siteFooter {
+    position: relative;
+    overflow: clip;
+    padding: 3rem 0 3.5rem;
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.14)),
+      #090703;
+    border-top: 1px solid rgba(204, 177, 130, 0.16);
+  }
+
+  .content {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+    z-index: 1;
+  }
+
+  .identity {
+    display: grid;
+    gap: 0.85rem;
+    max-width: 38rem;
+  }
+
+  .copyright {
+    font-size: clamp(1.3rem, 2vw, 1.6rem);
+    color: #f6eee2;
+  }
+
+  .tagline {
+    color: rgba(238, 226, 205, 0.58);
+    font-size: 0.95rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0 1rem;
+    border: 1px solid rgba(210, 181, 131, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 248, 236, 0.04);
+    color: rgba(244, 232, 213, 0.78);
+    font-size: 0.82rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition:
+      transform 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease,
+      background 200ms ease;
+  }
+
+  .links a:hover,
+  .links a:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(210, 181, 131, 0.3);
+    background: rgba(187, 145, 83, 0.1);
+    color: #f6eee2;
+  }
+</style>

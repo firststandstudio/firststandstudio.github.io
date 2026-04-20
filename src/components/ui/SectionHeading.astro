@@ -1,0 +1,54 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+interface Props {
+  eyebrow: string;
+  title: string;
+  copy?: string;
+  align?: "start" | "center";
+}
+
+const { eyebrow, title, copy, align = "start" } = Astro.props;
+---
+
+<header class:list={["sectionHeading", align]} data-reveal>
+  <p class="eyebrow">{eyebrow}</p>
+  <h2>{title}</h2>
+  {copy && <p class="copy">{copy}</p>}
+</header>
+
+<style>
+  .sectionHeading {
+    display: grid;
+    gap: 0.9rem;
+    min-width: 0;
+    margin-bottom: clamp(1.6rem, 4vw, 2.4rem);
+    max-width: 36rem;
+  }
+
+  .sectionHeading.center {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  h2 {
+    min-width: 0;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    text-wrap: balance;
+  }
+
+  .copy {
+    min-width: 0;
+    max-width: 35rem;
+    color: var(--text-soft);
+    font-size: clamp(0.96rem, 1.45vw, 1.04rem);
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  .sectionHeading.center .copy {
+    margin-inline: auto;
+  }
+</style>

@@ -1,0 +1,443 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import { ClientRouter } from "astro:transitions";
+import SiteFooter from "../components/footer/SiteFooter.astro";
+import SiteHeader from "../components/navigation/SiteHeader.astro";
+import { siteConfig } from "../data/site";
+import { getDictionary } from "../i18n/copy";
+import {
+  defaultLocale,
+  localeMeta,
+  supportedLocales,
+  swapLocale,
+  type SupportedLocale
+} from "../i18n/config";
+import "../styles/tokens.css";
+import "../styles/utilities.css";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string | { src: string };
+  canonicalPath?: string;
+  favicon?: string;
+  type?: "website" | "article";
+  noindex?: boolean;
+  theme?: "studio" | "erire";
+  structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
+  locale?: SupportedLocale;
+}
+
+const {
+  title = siteConfig.defaultTitle,
+  description = undefined,
+  image = siteConfig.socialImage,
+  canonicalPath = Astro.url.pathname,
+  favicon = siteConfig.favicon,
+  type = "website",
+  noindex = false,
+  theme = "studio",
+  structuredData,
+  locale = defaultLocale
+} = Astro.props;
+
+const siteOrigin = Astro.site ?? new URL(siteConfig.siteUrl);
+const dict = getDictionary(locale);
+const localeData = localeMeta[locale];
+const pageDescription = description ?? dict.meta.defaultDescription;
+const pageTitle = title === siteConfig.defaultTitle ? title : `${title} | ${siteConfig.studioName}`;
+const canonical = new URL(canonicalPath, siteOrigin).toString();
+const imageUrl =
+  typeof image === "string" ? new URL(image, siteOrigin).toString() : new URL(image.src, siteOrigin).toString();
+const isSvgFavicon = favicon.endsWith(".svg");
+const rasterFavicon = isSvgFavicon ? siteConfig.faviconPng : favicon;
+const alternateLinks = supportedLocales.map((code) => ({
+  code,
+  href: new URL(swapLocale(canonicalPath, code), siteOrigin).toString()
+}));
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteConfig.studioName,
+  founder: siteConfig.founder,
+  url: siteOrigin.toString(),
+  description: dict.meta.defaultDescription
+};
+
+const schema = structuredData
+  ? Array.isArray(structuredData)
+    ? [organizationSchema, ...structuredData]
+    : [organizationSchema, structuredData]
+  : [organizationSchema];
+---
+
+<!doctype html>
+<html lang={localeData.lang} dir={localeData.dir} data-page-theme={theme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={pageDescription} />
+    <meta name="theme-color" content="#f3ecdf" />
+    <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type={isSvgFavicon ? "image/svg+xml" : "image/png"} href={favicon} />
+    <link rel="alternate icon" type="image/png" href={rasterFavicon} />
+    <link rel="apple-touch-icon" href={rasterFavicon} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={siteConfig.studioName} />
+    <meta property="og:locale" content={localeData.og} />
+    <meta property="og:image" content={imageUrl} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    <title>{pageTitle}</title>
+    <ClientRouter fallback="animate" />
+
+    {alternateLinks.map((link) => (
+      <link rel="alternate" hreflang={link.code} href={link.href} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={alternateLinks[0].href} />
+
+    {schema.map((item) => (
+      <script type="application/ld+json" set:html={JSON.stringify(item)} />
+    ))}
+  </head>
+
+  <body>
+    <a class="skipLink" href="#main-content">{dict.common.skipToContent}</a>
+    <SiteHeader locale={locale} />
+    <main id="main-content">
+      <slot />
+    </main>
+    <SiteFooter locale={locale} />
+
+    <script is:inline>
+      if (!window.__firstStandStudio) {
+        const store = {
+          observer: null,
+          pointer: { x: 0.5, y: 0.5 },
+          scrollBound: false
+        };
+
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const isMobileViewport = () => window.matchMedia("(max-width: 780px)").matches;
+
+        const ensureObserver = () => {
+          if (store.observer) return store.observer;
+
+          store.observer = new IntersectionObserver(
+            (entries, observer) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("is-visible");
+                  observer.unobserve(entry.target);
+                }
+              });
+            },
+            {
+              threshold: 0.16,
+              rootMargin: "0px 0px -8% 0px"
+            }
+          );
+
+          return store.observer;
+        };
+
+        const initHeader = () => {
+          const updateState = () => {
+            const header = document.querySelector("[data-site-header]");
+            if (!header) return;
+            header.dataset.scrolled = String(window.scrollY > 12);
+          };
+
+          updateState();
+
+          if (!store.scrollBound) {
+            store.scrollBound = true;
+            window.addEventListener("scroll", updateState, { passive: true });
+          }
+
+          document.querySelectorAll("[data-menu-toggle]").forEach((button) => {
+            if (button.dataset.bound === "true") return;
+
+            button.dataset.bound = "true";
+            button.addEventListener("click", () => {
+              const next = !document.documentElement.classList.contains("nav-open");
+              document.documentElement.classList.toggle("nav-open", next);
+              button.setAttribute("aria-expanded", String(next));
+            });
+          });
+
+          document.querySelectorAll("[data-nav-panel] a, [data-locale-panel] a").forEach((link) => {
+            if (link.dataset.bound === "true") return;
+
+            link.dataset.bound = "true";
+            link.addEventListener("click", () => {
+              document.documentElement.classList.remove("nav-open");
+              document
+                .querySelectorAll("[data-menu-toggle]")
+                .forEach((button) => button.setAttribute("aria-expanded", "false"));
+            });
+          });
+        };
+
+        const initReveals = () => {
+          const observer = ensureObserver();
+          document.querySelectorAll("[data-reveal]").forEach((element) => {
+            if (element.classList.contains("is-visible")) return;
+            observer.observe(element);
+          });
+        };
+
+        const createParticles = (canvas) => {
+          if (canvas.dataset.initialized === "true") return;
+          canvas.dataset.initialized = "true";
+
+          const context = canvas.getContext("2d");
+          if (!context) return;
+
+          const tone = canvas.dataset.tone || "studio";
+          const shape = canvas.dataset.shape || "dot";
+          const distribution = canvas.dataset.distribution || "cluster";
+          const clusterX = Number(canvas.dataset.clusterX || 0.68);
+          const clusterY = Number(canvas.dataset.clusterY || 0.42);
+          const baseDensity = Number(canvas.dataset.density || 18);
+
+          let animationFrame = 0;
+          let width = 0;
+          let height = 0;
+          let particles = [];
+
+          const getPalette = () => {
+            if (tone === "erire") {
+              return {
+                core: "190, 151, 92",
+                edge: "152, 110, 57",
+                highlight: "243, 220, 175"
+              };
+            }
+
+            if (tone === "footer") {
+              return {
+                core: "222, 196, 152",
+                edge: "158, 124, 78",
+                highlight: "248, 232, 205"
+              };
+            }
+
+            return {
+              core: "204, 174, 122",
+              edge: "166, 131, 79",
+              highlight: "247, 228, 195"
+            };
+          };
+
+          const density = () => {
+            if (prefersReducedMotion.matches) {
+              return Math.max(shape === "leaf" ? 7 : 6, Math.round(baseDensity / 3));
+            }
+
+            return isMobileViewport()
+              ? Math.max(shape === "leaf" ? 12 : 8, Math.round(baseDensity / 2))
+              : baseDensity;
+          };
+
+          const seedParticles = () => {
+            particles = Array.from({ length: density() }, () => {
+              const isLeaf = shape === "leaf";
+              const spreadX = width * (0.18 + Math.random() * (isLeaf ? 0.38 : 0.24));
+              const spreadY = height * (0.16 + Math.random() * (isLeaf ? 0.42 : 0.22));
+              const centerX = width * clusterX;
+              const centerY = height * clusterY;
+              const x =
+                distribution === "wide"
+                  ? width * (0.06 + Math.random() * 0.88)
+                  : centerX + (Math.random() - 0.5) * spreadX;
+              const y =
+                distribution === "wide"
+                  ? height * (0.08 + Math.random() * 0.8)
+                  : centerY + (Math.random() - 0.5) * spreadY;
+
+              return {
+                x,
+                y,
+                size: isLeaf ? Math.random() * 1.1 + 0.75 : Math.random() * 1.4 + 0.45,
+                alpha: isLeaf ? Math.random() * 0.22 + 0.28 : Math.random() * 0.14 + 0.04,
+                depth: Math.random() * 0.8 + 0.1,
+                blur: isLeaf ? Math.random() * 4.8 + 0.8 : Math.random() > 0.8 ? Math.random() * 10 + 4 : 0,
+                amplitude: isLeaf ? Math.random() * 2.4 + 0.9 : Math.random() * 5 + 2.5,
+                phase: Math.random() * Math.PI * 2,
+                speed: Math.random() * 0.004 + 0.0015,
+                angle: Math.random() * Math.PI * 2,
+                angleDrift: (Math.random() - 0.5) * 0.4,
+                flutter: Math.random() * 0.0026 + 0.0012,
+                stretch: Math.random() * 0.7 + 1.45,
+                driftX: (Math.random() - 0.5) * 0.2,
+                driftY: Math.random() * 0.28 + 0.1,
+                spin: (Math.random() - 0.5) * 0.0045
+              };
+            });
+          };
+
+          const drawLeaf = (particle, x, y, opacity, palette, time) => {
+            const leafWidth = particle.size * particle.stretch * 7.2;
+            const leafHeight = particle.size * 3.05;
+            const rotation = particle.angle + Math.sin(time * particle.flutter + particle.phase) * particle.angleDrift;
+
+            context.save();
+            context.translate(x, y);
+            context.rotate(rotation);
+
+            const gradient = context.createLinearGradient(-leafWidth * 0.55, 0, leafWidth * 0.55, 0);
+            gradient.addColorStop(0, `rgba(${palette.highlight}, ${opacity})`);
+            gradient.addColorStop(0.52, `rgba(${palette.core}, ${opacity})`);
+            gradient.addColorStop(1, `rgba(${palette.edge}, ${Math.min(opacity * 1.08, 1)})`);
+
+            context.beginPath();
+            context.fillStyle = gradient;
+            context.shadowBlur = particle.blur;
+            context.shadowColor = `rgba(${palette.edge}, ${Math.max(opacity * 0.9, 0.18)})`;
+            context.moveTo(-leafWidth * 0.56, 0);
+            context.bezierCurveTo(-leafWidth * 0.22, -leafHeight * 0.9, leafWidth * 0.28, -leafHeight * 0.7, leafWidth * 0.56, 0);
+            context.bezierCurveTo(leafWidth * 0.22, leafHeight * 0.88, -leafWidth * 0.28, leafHeight * 0.68, -leafWidth * 0.56, 0);
+            context.closePath();
+            context.fill();
+
+            context.beginPath();
+            context.strokeStyle = `rgba(${palette.highlight}, ${Math.max(opacity * 0.68, 0.22)})`;
+            context.lineWidth = 0.95;
+            context.moveTo(-leafWidth * 0.42, 0);
+            context.quadraticCurveTo(0, -leafHeight * 0.08, leafWidth * 0.42, 0);
+            context.stroke();
+            context.restore();
+          };
+
+          const resize = () => {
+            const bounds = canvas.getBoundingClientRect();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            width = Math.max(1, bounds.width);
+            height = Math.max(1, bounds.height);
+
+            canvas.width = Math.round(width * dpr);
+            canvas.height = Math.round(height * dpr);
+            context.setTransform(dpr, 0, 0, dpr, 0, 0);
+            seedParticles();
+            draw(performance.now());
+          };
+
+          const draw = (time) => {
+            if (!document.body.contains(canvas)) {
+              window.removeEventListener("resize", resize);
+              cancelAnimationFrame(animationFrame);
+              return;
+            }
+
+            context.clearRect(0, 0, width, height);
+
+            const palette = getPalette();
+            const pointerX = (store.pointer.x - 0.5) * 10;
+            const pointerY = (store.pointer.y - 0.5) * 8;
+
+            particles.forEach((particle, index) => {
+              particle.phase += particle.speed;
+              if (shape === "leaf") {
+                particle.x += particle.driftX;
+                particle.y += particle.driftY;
+                particle.angle += particle.spin;
+
+                const overflow = 28;
+                if (particle.y > height + overflow) {
+                  particle.y = -overflow;
+                  particle.x = width * (0.06 + Math.random() * 0.88);
+                }
+
+                if (particle.x > width + overflow) {
+                  particle.x = -overflow;
+                } else if (particle.x < -overflow) {
+                  particle.x = width + overflow;
+                }
+              }
+
+              const dx = Math.sin(particle.phase + index) * particle.amplitude;
+              const dy = Math.cos(particle.phase * 0.9 + index) * particle.amplitude;
+              const pointerShiftX = shape === "leaf" ? pointerX * (particle.depth * 0.34) : pointerX * particle.depth;
+              const pointerShiftY = shape === "leaf" ? pointerY * (particle.depth * 0.26) : pointerY * particle.depth;
+              const x = particle.x + dx + pointerShiftX;
+              const y = particle.y + dy + pointerShiftY;
+              const opacity = particle.alpha * (0.6 + Math.sin(time * 0.0015 + particle.phase) * 0.4);
+
+              if (shape === "leaf") {
+                drawLeaf(particle, x, y, opacity, palette, time);
+                return;
+              }
+
+              context.beginPath();
+              context.fillStyle = `rgba(${palette.core}, ${opacity})`;
+              context.shadowBlur = particle.blur;
+              context.shadowColor = `rgba(${palette.edge}, ${Math.max(opacity, 0.12)})`;
+              context.arc(x, y, particle.size, 0, Math.PI * 2);
+              context.fill();
+            });
+
+            context.shadowBlur = 0;
+
+            if (!prefersReducedMotion.matches && !document.hidden) {
+              animationFrame = requestAnimationFrame(draw);
+            }
+          };
+
+          window.addEventListener("resize", resize, { passive: true });
+          resize();
+
+          if (!prefersReducedMotion.matches) {
+            animationFrame = requestAnimationFrame(draw);
+          }
+        };
+
+        const initParticles = () => {
+          document.querySelectorAll("[data-particle-zone]").forEach(createParticles);
+        };
+
+        const init = () => {
+          requestAnimationFrame(() => document.documentElement.classList.add("is-ready"));
+          initHeader();
+          initReveals();
+          initParticles();
+        };
+
+        window.__firstStandStudio = store;
+
+        document.addEventListener("pointermove", (event) => {
+          store.pointer.x = event.clientX / window.innerWidth;
+          store.pointer.y = event.clientY / window.innerHeight;
+        });
+
+        document.addEventListener("astro:page-load", init);
+        document.addEventListener("astro:after-swap", () => {
+          document.documentElement.classList.remove("nav-open");
+          document
+            .querySelectorAll("[data-menu-toggle]")
+            .forEach((button) => button.setAttribute("aria-expanded", "false"));
+        });
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", init, { once: true });
+        } else {
+          init();
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+/* Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved. */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap");
+
+:root {
+  color-scheme: light;
+  --bg: #f3ecdf;
+  --bg-elevated: #ede3d1;
+  --bg-panel: rgba(255, 250, 243, 0.82);
+  --bg-panel-strong: rgba(250, 243, 234, 0.94);
+  --surface: rgba(123, 96, 60, 0.05);
+  --surface-strong: rgba(123, 96, 60, 0.1);
+  --line: rgba(114, 88, 56, 0.16);
+  --line-strong: rgba(91, 67, 38, 0.26);
+  --text: #181410;
+  --text-soft: #5e5245;
+  --text-muted: #8f7d68;
+  --green: #977246;
+  --green-bright: #bb9153;
+  --green-soft: rgba(187, 145, 83, 0.12);
+  --silver: #c1b39f;
+  --shadow: 0 22px 52px rgba(86, 67, 42, 0.1);
+  --shadow-soft: 0 10px 24px rgba(86, 67, 42, 0.08);
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --container: min(1120px, calc(100vw - 32px));
+  --container-wide: min(1240px, calc(100vw - 32px));
+  --section-space: clamp(4.25rem, 7vw, 6.8rem);
+  --font-serif: "Sora", "Avenir Next", "Segoe UI", sans-serif;
+  --font-sans: "Manrope", "Aptos", "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+:root[data-page-theme="erire"] {
+  --green: #8d6538;
+  --green-bright: #aa7840;
+  --green-soft: rgba(170, 120, 64, 0.12);
+}

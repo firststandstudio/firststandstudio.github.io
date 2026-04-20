@@ -1,0 +1,219 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import type { CollectionEntry } from "astro:content";
+import { formatDate } from "../../lib/date";
+import { defaultLocale, localizePath, type SupportedLocale } from "../../i18n/config";
+import { getDictionary } from "../../i18n/copy";
+
+interface Props {
+  entry: CollectionEntry<"devlogs">;
+  locale?: SupportedLocale;
+  title?: string;
+  description?: string;
+  tags?: string[];
+  ctaLabel?: string;
+}
+
+const {
+  entry,
+  locale = defaultLocale,
+  title = entry.data.title,
+  description = entry.data.description,
+  tags = entry.data.tags,
+  ctaLabel = getDictionary(locale).common.readEntry
+} = Astro.props;
+---
+
+<article class="card" data-reveal>
+  <a class="inner" href={localizePath(`/devlog/${entry.id}/`, locale)}>
+    <div class="meta">
+      <time datetime={entry.data.pubDate.toISOString()}>{formatDate(entry.data.pubDate, locale)}</time>
+      {tags.length > 0 && <span>{tags.join(" · ")}</span>}
+    </div>
+
+    <h3>{title}</h3>
+    <p>{description}</p>
+    <span class="cta">{ctaLabel}</span>
+  </a>
+</article>
+
+<style>
+  .card {
+    height: 100%;
+    min-width: 0;
+  }
+
+  .inner {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 1rem;
+    height: 100%;
+    min-width: 0;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.46)),
+      var(--bg-panel);
+    box-shadow: var(--shadow-soft);
+    overflow: clip;
+    isolation: isolate;
+    transition:
+      transform 220ms ease,
+      border-color 220ms ease,
+      box-shadow 220ms ease,
+      background 220ms ease;
+    transform-origin: center center;
+  }
+
+  .inner::before,
+  .inner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity 220ms ease,
+      filter 220ms ease;
+  }
+
+  .inner::before {
+    padding: 1px;
+    background: conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0) 0deg,
+      rgba(255, 255, 255, 0.42) 72deg,
+      rgba(187, 145, 83, 0.92) 140deg,
+      rgba(255, 249, 240, 0.18) 214deg,
+      rgba(170, 120, 64, 0.88) 286deg,
+      rgba(255, 255, 255, 0) 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: devlogOutlineSpin 3.2s linear infinite paused;
+  }
+
+  .inner::after {
+    inset: 1px;
+    box-shadow:
+      0 0 12px rgba(187, 145, 83, 0.18),
+      0 0 24px rgba(255, 244, 228, 0.14),
+      inset 0 0 12px rgba(255, 255, 255, 0.12);
+    animation: devlogOutlinePulse 1.8s ease-in-out infinite alternate paused;
+  }
+
+  .inner:hover,
+  .inner:focus-visible {
+    transform: rotate(0.28deg);
+    border-color: rgba(170, 120, 64, 0.24);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.54)),
+      var(--bg-panel-strong);
+    box-shadow:
+      0 16px 34px rgba(86, 67, 42, 0.1),
+      0 0 20px rgba(187, 145, 83, 0.08);
+  }
+
+  .inner:hover::before,
+  .inner:hover::after,
+  .inner:focus-visible::before,
+  .inner:focus-visible::after {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(187, 145, 83, 0.22));
+    animation-play-state: running;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    min-width: 0;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  h3 {
+    min-width: 0;
+    font-size: clamp(1.42rem, 2.55vw, 2rem);
+    line-height: 1.02;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    text-wrap: balance;
+  }
+
+  p {
+    min-width: 0;
+    color: var(--text-soft);
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  .cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: fit-content;
+    margin-top: auto;
+    color: var(--green-bright);
+    font-size: 0.82rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .cta::after {
+    content: "";
+    width: 2.3rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.7;
+    transition:
+      opacity 220ms ease,
+      background 220ms ease;
+  }
+
+  .inner:hover .cta::after,
+  .inner:focus-visible .cta::after {
+    opacity: 1;
+    background: linear-gradient(90deg, currentColor, rgba(187, 145, 83, 0.18));
+  }
+
+  @keyframes devlogOutlineSpin {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes devlogOutlinePulse {
+    0% {
+      box-shadow:
+        0 0 10px rgba(187, 145, 83, 0.16),
+        0 0 18px rgba(255, 244, 228, 0.12),
+        inset 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    100% {
+      box-shadow:
+        0 0 16px rgba(187, 145, 83, 0.28),
+        0 0 28px rgba(255, 244, 228, 0.18),
+        inset 0 0 14px rgba(255, 255, 255, 0.16);
+    }
+  }
+</style>

@@ -1,0 +1,58 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import { getDictionary } from "../i18n/copy";
+import { defaultLocale, localizePath, type SupportedLocale } from "../i18n/config";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+interface Props {
+  locale?: SupportedLocale;
+}
+
+const { locale = defaultLocale } = Astro.props;
+const dict = getDictionary(locale);
+---
+
+<BaseLayout title="404" description={dict.meta.notFoundDescription} noindex={true} locale={locale}>
+  <section class="section pageIntro">
+    <div class="shell">
+      <div class="frame surfaceCard" data-reveal>
+        <p class="eyebrow">{dict.notFound.eyebrow}</p>
+        <h1 transition:name="page-title">{dict.notFound.title}</h1>
+        <p class="lede">{dict.notFound.copy}</p>
+        <a class="homeLink" href={localizePath("/", locale)}>{dict.common.returnHome}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .frame {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.6rem, 5vw, 3rem);
+    border-radius: clamp(1.8rem, 4vw, 2.3rem);
+    text-align: center;
+  }
+
+  .frame h1 {
+    font-size: clamp(2.8rem, 5vw, 4.6rem);
+  }
+
+  .lede {
+    margin-inline: auto;
+  }
+
+  .homeLink {
+    display: inline-flex;
+    justify-self: center;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0 1.2rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 248, 239, 0.84);
+    color: var(--text);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+</style>

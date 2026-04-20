@@ -1,0 +1,161 @@
+---
+// Date: 4/20/2026 | Developer: Yahia Saad | License: First Stand Studio. All rights reserved.
+import AboutManifesto from "../components/about/AboutManifesto.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import { profileLinks, siteConfig } from "../data/site";
+import { getDictionary } from "../i18n/copy";
+import { defaultLocale, type SupportedLocale } from "../i18n/config";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+interface Props {
+  locale?: SupportedLocale;
+}
+
+const { locale = defaultLocale } = Astro.props;
+const dict = getDictionary(locale);
+---
+
+<BaseLayout title={dict.navigation.about} description={dict.meta.aboutDescription} locale={locale}>
+  <section class="section pageIntro">
+    <div class="shellWide">
+      <div class="intro">
+        <p class="eyebrow" data-reveal>{dict.aboutPage.eyebrow}</p>
+        <h1 class="pageTitle" data-reveal transition:name="page-title" style="--reveal-delay: 80ms;">
+          {dict.aboutPage.title}
+        </h1>
+        <p class="lede" data-reveal style="--reveal-delay: 180ms;">
+          {dict.aboutPage.lede}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shellWide">
+      <AboutManifesto
+        eyebrow={dict.aboutSection.eyebrow}
+        manifesto={dict.aboutSection.manifesto}
+        aboutText={dict.aboutSection.aboutText}
+        founderLabel={dict.aboutSection.founderLabel}
+        founderValue={siteConfig.location}
+        originLabel={dict.aboutSection.originLabel}
+        originValue={siteConfig.skillSummary}
+        positionLabel={dict.aboutSection.positionLabel}
+        positionValue={dict.aboutSection.positionValue}
+      />
+    </div>
+  </section>
+
+  <section class="section principles">
+    <div class="shellWide">
+      <SectionHeading
+        eyebrow={dict.aboutPage.principlesEyebrow}
+        title={dict.aboutPage.principlesTitle}
+        copy={dict.aboutPage.principlesCopy}
+      />
+
+      <div class="grid">
+        {dict.aboutPage.principles.map((principle, index) => (
+          <article class="principle surfaceCard" data-reveal style={`--reveal-delay:${index * 110}ms`}>
+            <p class="label">{principle.label}</p>
+            <h2>{principle.title}</h2>
+            <p>{principle.copy}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section compactLinks">
+    <div class="shell">
+      <div class="links" data-reveal>
+        {profileLinks.map((link) => (
+          <a href={link.href} target="_blank" rel="noreferrer">{link.label}</a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .intro {
+    display: grid;
+    gap: 1rem;
+    max-width: 40rem;
+  }
+
+  .principles {
+    padding-top: 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .principle {
+    display: grid;
+    gap: 0.95rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .label {
+    color: var(--green-bright);
+    font-size: 0.76rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .principle h2 {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    line-height: 1;
+  }
+
+  .principle p:last-child {
+    color: var(--text-soft);
+  }
+
+  .compactLinks {
+    padding-top: 0;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    justify-content: center;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.9rem;
+    padding: 0 1rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 248, 239, 0.78);
+    color: var(--text-soft);
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition:
+      border-color 220ms ease,
+      background 220ms ease,
+      color 220ms ease;
+  }
+
+  .links a:hover,
+  .links a:focus-visible {
+    border-color: var(--line-strong);
+    background: rgba(255, 250, 244, 0.98);
+    color: var(--text);
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
